@@ -2,7 +2,7 @@
 
 ### Dynamic Weather Intelligence & Localized Flood Defense for Greater Accra
 
-**SkyGround** is a decoupled full-stack platform built with a high-polish **React Native (Expo)** client and a dedicated **Node.js / TypeScript Geospatial Backend Server** powered by **Neon Serverless PostgreSQL (PostGIS)**, **Google AI Studio (Gemini Modles)**, and **Khaya AI (Ghana NLP)**.
+**SkyGround** is a decoupled full-stack platform built with a high-polish **React Native (Expo)** client and a dedicated **Node.js / TypeScript Geospatial Backend Server** powered by **Neon Serverless PostgreSQL (PostGIS)**, **Google AI Studio (Gemini Model)**, and **Khaya AI (Ghana NLP)**.
 
 Designed for flood-vulnerable urban communities in Greater Accra (_Odawna, Adabraka, Alajo, and Glefe_), SkyGround functions as an everyday weather utility while transforming into a high-contrast early warning and crowdsourced ground-truthing defense network before convective storm surges.
 
