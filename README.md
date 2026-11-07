@@ -1,15 +1,17 @@
 # SkyGround 🌊🇬🇭
+
 ### Dynamic Weather Intelligence & Localized Flood Defense for Greater Accra
 
-**SkyGround** is a decoupled full-stack platform built with a high-polish **React Native (Expo)** client and a dedicated **Node.js / TypeScript Geospatial Backend Server** powered by **Neon Serverless PostgreSQL (PostGIS)**, **Google AI Studio (Gemini 2.5 Flash)**, and **Khaya AI (Ghana NLP)**.
+**SkyGround** is a decoupled full-stack platform built with a high-polish **React Native (Expo)** client and a dedicated **Node.js / TypeScript Geospatial Backend Server** powered by **Neon Serverless PostgreSQL (PostGIS)**, **Google AI Studio (Gemini Modles)**, and **Khaya AI (Ghana NLP)**.
 
-Designed for flood-vulnerable urban communities in Greater Accra (*Odawna, Adabraka, Alajo, and Glefe*), SkyGround functions as an everyday weather utility while transforming into a high-contrast early warning and crowdsourced ground-truthing defense network before convective storm surges.
+Designed for flood-vulnerable urban communities in Greater Accra (_Odawna, Adabraka, Alajo, and Glefe_), SkyGround functions as an everyday weather utility while transforming into a high-contrast early warning and crowdsourced ground-truthing defense network before convective storm surges.
 
 ---
 
 ## 🗂️ Decoupled Project Structure
 
 The codebase is cleanly structured into two independent directories:
+
 - **`client/`**: The complete cross-platform React Native / Expo mobile application.
 - **`server/`**: The dedicated Geospatial Backend API server.
 
@@ -75,19 +77,19 @@ SkyGround/
 
 ## 📡 Server REST Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/health` | Service health status and timestamp |
-| `POST` | `/api/init-db` | Executes PostGIS DDL (`CREATE EXTENSION IF NOT EXISTS postgis`) and seeds catchments |
-| `GET` | `/api/catchments` | Lists all monitored Greater Accra catchments |
-| `GET` | `/api/catchment/current?lat=...&lon=...` | Detects current catchment via PostGIS `ST_Contains` |
-| `POST` | `/api/incidents` | Inserts a 1-tap geo-tagged incident (`HIGH_WATER`, `CHOKED_GUTTER`, etc.) via `ST_GeogFromText` |
-| `GET` | `/api/incidents/nearby?lat=...&lon=...&radius=5000` | Queries nearby community reports using PostGIS `ST_DWithin` |
-| `POST` | `/api/incidents/:id/upvote` | Increments hazard verification score |
-| `GET` | `/api/telemetry/:catchmentId` | Ingests rain accumulation, soil moisture, and calculates DRII |
-| `POST` | `/api/reasoning/advisory` | Calls Google AI Studio (Gemini 2.5 Flash) for structured community & engineering directives |
-| `POST` | `/api/voice/translate` | Translates advisories into Twi (`tw`) and Ga (`gaa`) via Khaya AI |
-| `POST` | `/api/voice/tts` | Generates speech audio bytes/URL via Khaya TTS |
+| Method | Endpoint                                            | Description                                                                                     |
+| ------ | --------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `GET`  | `/health`                                           | Service health status and timestamp                                                             |
+| `POST` | `/api/init-db`                                      | Executes PostGIS DDL (`CREATE EXTENSION IF NOT EXISTS postgis`) and seeds catchments            |
+| `GET`  | `/api/catchments`                                   | Lists all monitored Greater Accra catchments                                                    |
+| `GET`  | `/api/catchment/current?lat=...&lon=...`            | Detects current catchment via PostGIS `ST_Contains`                                             |
+| `POST` | `/api/incidents`                                    | Inserts a 1-tap geo-tagged incident (`HIGH_WATER`, `CHOKED_GUTTER`, etc.) via `ST_GeogFromText` |
+| `GET`  | `/api/incidents/nearby?lat=...&lon=...&radius=5000` | Queries nearby community reports using PostGIS `ST_DWithin`                                     |
+| `POST` | `/api/incidents/:id/upvote`                         | Increments hazard verification score                                                            |
+| `GET`  | `/api/telemetry/:catchmentId`                       | Ingests rain accumulation, soil moisture, and calculates DRII                                   |
+| `POST` | `/api/reasoning/advisory`                           | Calls Google AI Studio (Gemini 2.5 Flash) for structured community & engineering directives     |
+| `POST` | `/api/voice/translate`                              | Translates advisories into Twi (`tw`) and Ga (`gaa`) via Khaya AI                               |
+| `POST` | `/api/voice/tts`                                    | Generates speech audio bytes/URL via Khaya TTS                                                  |
 
 ---
 
@@ -110,6 +112,7 @@ SkyGround/
 ## 🚀 Quick Start Guide
 
 ### 1. Run the Backend Server
+
 ```bash
 # From workspace root
 npm run server
@@ -118,9 +121,11 @@ npm run server
 cd server
 npm run dev
 ```
+
 The server will start at `http://localhost:4000` with automatic PostGIS schema initialization.
 
 ### 2. Run the Mobile Client (Expo)
+
 ```bash
 # From workspace root
 npm run client
@@ -129,12 +134,15 @@ npm run client
 cd client
 npx expo start
 ```
+
 - Press **`a`** for Android Emulator / Expo Go.
 - Press **`i`** for iOS Simulator.
 - Press **`w`** for Web Browser.
 
 ### 3. Verify TypeScript across Monorepo
+
 ```bash
 npm run typecheck
 ```
+
 Checks both `client` and `server` TypeScript configs, passing with 0 errors.
