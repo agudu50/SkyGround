@@ -48,8 +48,8 @@ app.use('/api/voice', voiceRouter);
 
 // Start server
 app.listen(PORT, async () => {
-  console.log(`🚀 SkyGround Server running at http://localhost:${PORT}`);
-  console.log(`📡 Endpoints active:`);
+  console.log(` SkyGround Server running at http://localhost:${PORT}`);
+  console.log(` Endpoints active:`);
   console.log(`   - GET  /health`);
   console.log(`   - POST /api/init-db`);
   console.log(`   - GET  /api/catchment/current?lat=...&lon=...`);
