@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Colors, UI } from '../theme/colors';
 import { Catchment, CommunityIncident, HazardType } from '../types';
@@ -39,46 +40,43 @@ export const HazardLoggerSheet: React.FC<HazardLoggerSheetProps> = ({
       title: 'Water Rising',
       subtitle: 'Flash flood surge / road depth',
       color: Colors.hazards.HIGH_WATER,
-      bg: 'rgba(239, 68, 68, 0.12)',
-      icon: (c) => <Waves size={24} color={c} />,
+      bg: 'rgba(248, 113, 113, 0.14)',
+      icon: (c) => <Waves size={26} color={c} />,
     },
     {
       type: 'CHOKED_GUTTER',
       title: 'Choked Gutter',
       subtitle: 'Plastic waste / sediment block',
       color: Colors.hazards.CHOKED_GUTTER,
-      bg: 'rgba(245, 158, 11, 0.12)',
-      icon: (c) => <Construction size={24} color={c} />,
+      bg: 'rgba(251, 191, 36, 0.14)',
+      icon: (c) => <Construction size={26} color={c} />,
     },
     {
       type: 'IMPASSABLE_BRIDGE',
       title: 'Impassable Bridge',
       subtitle: 'Submerged crossing / drain rail',
       color: Colors.hazards.IMPASSABLE_BRIDGE,
-      bg: 'rgba(236, 72, 153, 0.12)',
-      icon: (c) => <TriangleAlert size={24} color={c} />,
+      bg: 'rgba(244, 114, 182, 0.14)',
+      icon: (c) => <TriangleAlert size={26} color={c} />,
     },
     {
       type: 'STANDING_WATER',
       title: 'Waterlogged Mud',
       subtitle: 'Persistent stagnant ponding',
       color: Colors.hazards.STANDING_WATER,
-      bg: 'rgba(59, 130, 246, 0.12)',
-      icon: (c) => <Droplets size={24} color={c} />,
+      bg: 'rgba(96, 165, 250, 0.14)',
+      icon: (c) => <Droplets size={26} color={c} />,
     },
   ];
 
   const handle1TapReport = async (option: HazardOption) => {
     try {
-      // High-impact haptic feedback for 1-tap emergency action
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     } catch (e) {}
 
     setSubmittingType(option.type);
 
     try {
-      // Dispatches GPS coordinates to Neon DB in background
-      // Adding minor jitter around center for realism if user is simulating
       const lat = currentCatchment.center.latitude + (Math.random() - 0.5) * 0.003;
       const lon = currentCatchment.center.longitude + (Math.random() - 0.5) * 0.003;
 
@@ -108,172 +106,179 @@ export const HazardLoggerSheet: React.FC<HazardLoggerSheetProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <View>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>1-Tap Community Hazard Logger</Text>
-            <View style={styles.liveBadge}>
-              <Flame size={12} color={Colors.crimsonEmergency} />
-              <Text style={styles.liveBadgeText}>GROUND-TRUTH</Text>
+    <View style={[styles.containerWrap, UI.shadow.lg]}>
+      <BlurView style={styles.cardBlur} intensity={18}>
+        <View style={styles.cardContent}>
+          <View style={styles.headerRow}>
+            <View>
+              <View style={styles.titleRow}>
+                <Text style={styles.title}>1-Tap Community Hazard Logger</Text>
+                <View style={styles.liveBadge}>
+                  <Flame size={13} color={Colors.crimsonEmergency} />
+                  <Text style={styles.liveBadgeText}>GROUND-TRUTH</Text>
+                </View>
+              </View>
+              <Text style={styles.subtitle}>
+                Tap once to geo-tag live flash points for your neighbors and NADMO
+              </Text>
             </View>
           </View>
-          <Text style={styles.subtitle}>
-            Tap once to geo-tag live flash points for your neighbors and NADMO
-          </Text>
-        </View>
-      </View>
 
-      {/* Confirmation Toast */}
-      {recentlyReported && (
-        <View style={styles.toast}>
-          <CheckCircle size={16} color={Colors.emeraldSuccess} />
-          <Text style={styles.toastText}>
-            Reported "{recentlyReported}" in {currentCatchment.name}. Logged to PostGIS!
-          </Text>
-        </View>
-      )}
-
-      {/* 4 Large Tactile Buttons (2x2 Grid) */}
-      <View style={styles.grid}>
-        {hazardOptions.map((opt) => {
-          const isBusy = submittingType === opt.type;
-          return (
-            <TouchableOpacity
-              key={opt.type}
-              style={[
-                styles.button,
-                {
-                  backgroundColor: opt.bg,
-                  borderColor: opt.color,
-                },
-              ]}
-              onPress={() => handle1TapReport(opt)}
-              activeOpacity={0.7}
-              disabled={submittingType !== null}
-            >
-              <View style={styles.buttonTop}>
-                <View style={[styles.iconCircle, { backgroundColor: opt.color }]}>
-                  {opt.icon(Colors.bgDark)}
-                </View>
-                {isBusy && <ActivityIndicator size="small" color={opt.color} />}
-              </View>
-
-              <Text style={[styles.buttonTitle, { color: Colors.textPrimary }]}>
-                {opt.title}
+          {/* Confirmation Toast */}
+          {recentlyReported && (
+            <View style={[styles.toast, { borderColor: 'rgba(52, 211, 153, 0.4)' }]}>
+              <CheckCircle size={17} color={Colors.emeraldSuccess} />
+              <Text style={styles.toastText}>
+                Reported "{recentlyReported}" in {currentCatchment.name}. Logged to PostGIS!
               </Text>
-              <Text style={styles.buttonSubtitle} numberOfLines={1}>
-                {opt.subtitle}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+            </View>
+          )}
+
+          {/* 4 Large Tactile Buttons (2x2 Grid) */}
+          <View style={styles.grid}>
+            {hazardOptions.map((opt) => {
+              const isBusy = submittingType === opt.type;
+              return (
+                <TouchableOpacity
+                  key={opt.type}
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: opt.bg,
+                      borderColor: opt.color,
+                    },
+                    isBusy && styles.buttonBusy,
+                  ]}
+                  onPress={() => handle1TapReport(opt)}
+                  activeOpacity={0.75}
+                  disabled={submittingType !== null}
+                >
+                  <View style={styles.buttonTop}>
+                    <View style={[styles.iconCircle, { backgroundColor: opt.color }]}>
+                      {opt.icon(Colors.bgDark)}
+                    </View>
+                    {isBusy && <ActivityIndicator size="small" color={opt.color} />}
+                  </View>
+
+                  <Text style={[styles.buttonTitle, { color: Colors.textPrimary }]}>
+                    {opt.title}
+                  </Text>
+                  <Text style={styles.buttonSubtitle} numberOfLines={1}>
+                    {opt.subtitle}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </BlurView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 16,
+  containerWrap: {
+    marginHorizontal: 20,
     marginVertical: 10,
-    backgroundColor: Colors.cardSurface,
     borderRadius: UI.borderRadius.xl,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.borderSubtle,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
+    overflow: 'hidden',
+  },
+  cardBlur: {
+    borderRadius: UI.borderRadius.xl,
+    overflow: 'hidden',
+  },
+  cardContent: {
+    padding: 22,
   },
   headerRow: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   title: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 17,
+    fontWeight: '900',
     color: Colors.textPrimary,
   },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    gap: 6,
+    backgroundColor: 'rgba(248, 113, 113, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: UI.borderRadius.pill,
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(248, 113, 113, 0.35)',
   },
   liveBadgeText: {
-    fontSize: 8,
-    fontWeight: '800',
+    fontSize: 9,
+    fontWeight: '900',
     color: Colors.crimsonEmergency,
     letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
-    marginTop: 3,
+    marginTop: 4,
   },
   toast: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.14)',
-    borderColor: 'rgba(16, 185, 129, 0.4)',
-    borderWidth: 1,
+    gap: 10,
+    backgroundColor: 'rgba(52, 211, 153, 0.14)',
+    borderWidth: 1.5,
     borderRadius: UI.borderRadius.md,
-    padding: 10,
-    marginBottom: 12,
+    padding: 12,
+    marginBottom: 14,
   },
   toastText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     color: Colors.emeraldSuccess,
     flex: 1,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
   },
   button: {
-    width: '48.5%',
-    minHeight: 90, // exceeds minTouchTarget 56dp
+    width: '48%',
+    minHeight: 112,
     borderRadius: UI.borderRadius.lg,
-    padding: 12,
+    padding: 16,
     borderWidth: 1.5,
     justifyContent: 'space-between',
+    ...UI.shadow.sm,
+  },
+  buttonBusy: {
+    opacity: 0.6,
   },
   buttonTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   iconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
+    ...UI.shadow.sm,
   },
   buttonTitle: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '900',
   },
   buttonSubtitle: {
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
   },
 });
-

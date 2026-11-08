@@ -1,73 +1,110 @@
 export const Colors = {
-  // Base Surfaces
-  bgDark: '#0B0F17',          // Deep Midnight Slate
-  cardSurface: '#151D2A',     // Card Surface
-  cardElevated: '#1D2738',    // Higher contrast surface
-  cardHighlight: '#222E42',   // Active / pressed cards
+  // Base Surfaces — Deep Midnight Slate modernized
+  bgDark: '#05070A',            // Deepest void background
+  bgSecondary: '#0B0F17',       // Slightly lighter sections
+  cardSurface: '#0F172A',       // Slate-900 card surface
+  cardElevated: '#1E293B',      // Slate-800 elevated surface
+  cardHighlight: '#334155',     // Active / pressed cards
   
-  // Contrast Accents
-  electricCyan: '#06B6D4',    // Daily primary & live sensors
-  amberWarning: '#F59E0B',    // Amber alert
-  crimsonEmergency: '#EF4444',// Red critical alert
-  waterlogBlue: '#3B82F6',    // Persistent saturated soil / waterlog
-  emeraldSuccess: '#10B981',  // Safe / verified
+  // Gradients (used in linear-gradient backgrounds)
+  gradientPrimary: ['#0F172A', '#1E293B'],
+  gradientGlow: ['rgba(34, 211, 238, 0.15)', 'rgba(34, 211, 238, 0.05)'],
+  gradientThreat: {
+    LOW: ['rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0.04)'],
+    AMBER: ['rgba(251, 191, 36, 0.14)', 'rgba(251, 191, 36, 0.04)'],
+    CRITICAL: ['rgba(248, 113, 113, 0.18)', 'rgba(248, 113, 113, 0.06)'],
+  },
+  
+  // Contrast Accents — Vibrant modern accents
+  electricCyan: '#22D3EE',     // Daily primary & live sensors (brighter)
+  electricCyanGlow: 'rgba(34, 211, 238, 0.5)',
+  amberWarning: '#FBBF24',     // Amber alert (brighter)
+  amberWarningGlow: 'rgba(251, 191, 36, 0.5)',
+  crimsonEmergency: '#F87171', // Red critical alert (brighter)
+  crimsonEmergencyGlow: 'rgba(248, 113, 113, 0.5)',
+  waterlogBlue: '#60A5FA',     // Persistent saturated soil / waterlog
+  waterlogBlueGlow: 'rgba(96, 165, 250, 0.5)',
+  emeraldSuccess: '#34D399',   // Safe / verified
   
   // Threat Level Semantics
   threat: {
     LOW: {
-      primary: '#10B981',
-      bg: 'rgba(16, 185, 129, 0.12)',
-      border: 'rgba(16, 185, 129, 0.35)',
-      glow: '#10B981',
-      badge: '#047857',
+      primary: '#34D399',
+      bg: 'rgba(52, 211, 153, 0.12)',
+      border: 'rgba(52, 211, 153, 0.35)',
+      glow: '#34D399',
+      badge: '#065F46',
       label: 'NORMAL / SAFE',
     },
     AMBER: {
-      primary: '#F59E0B',
-      bg: 'rgba(245, 158, 11, 0.14)',
-      border: 'rgba(245, 158, 11, 0.45)',
-      glow: '#F59E0B',
+      primary: '#FBBF24',
+      bg: 'rgba(251, 191, 36, 0.14)',
+      border: 'rgba(251, 191, 36, 0.45)',
+      glow: '#FBBF24',
       badge: '#B45309',
       label: 'AMBER FLOOD WATCH',
     },
     CRITICAL: {
-      primary: '#EF4444',
-      bg: 'rgba(239, 68, 68, 0.18)',
-      border: 'rgba(239, 68, 68, 0.65)',
-      glow: '#EF4444',
+      primary: '#F87171',
+      bg: 'rgba(248, 113, 113, 0.18)',
+      border: 'rgba(248, 113, 113, 0.65)',
+      glow: '#F87171',
       badge: '#B91C1C',
       label: 'CRITICAL INUNDATION',
     },
   },
-
-  // Borders & Dividers
+  
+  // Borders & Dividers — Subtle glass borders
   borderSubtle: 'rgba(255, 255, 255, 0.08)',
-  borderActive: 'rgba(6, 182, 212, 0.4)',
+  borderActive: 'rgba(34, 211, 238, 0.4)',
   divider: 'rgba(255, 255, 255, 0.06)',
-
+  
   // Typography
-  textPrimary: '#F8FAFC',     // Crisp white
-  textSecondary: '#94A3B8',   // Slate muted
-  textMuted: '#64748B',       // Low-priority caption
-  textAccent: '#38BDF8',      // Cyan glow text
-
+  textPrimary: '#F8FAFC',      // Crisp white
+  textSecondary: '#CBD5E1',    // Slate muted (lighter for readability)
+  textMuted: '#94A3B8',        // Low-priority caption
+  textAccent: '#7DD3FC',       // Cyan glow text
+  
   // Hazard Icon Colors
   hazards: {
-    HIGH_WATER: '#EF4444',
-    CHOKED_GUTTER: '#F59E0B',
-    IMPASSABLE_BRIDGE: '#EC4899',
-    STANDING_WATER: '#3B82F6',
+    HIGH_WATER: '#F87171',
+    CHOKED_GUTTER: '#FBBF24',
+    IMPASSABLE_BRIDGE: '#F472B6',
+    STANDING_WATER: '#60A5FA',
   },
 };
 
 export const UI = {
   borderRadius: {
-    sm: 12,
-    md: 16,
-    lg: 20,
-    xl: 24,
+    sm: 14,
+    md: 20,
+    lg: 28,
+    xl: 36,
     pill: 9999,
   },
-  minTouchTarget: 56,
+  minTouchTarget: 64,
+  // Modern shadow / elevation system
+  shadow: {
+    sm: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.4,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    md: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.5,
+      shadowRadius: 16,
+      elevation: 8,
+    },
+    lg: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 16 },
+      shadowOpacity: 0.6,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+  },
 };
-

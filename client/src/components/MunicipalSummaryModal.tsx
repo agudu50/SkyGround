@@ -7,6 +7,7 @@ import {
   ScrollView,
   Share,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Colors, UI } from '../theme/colors';
 import { Catchment, CommunityIncident, GeminiAdvisory, MunicipalBrief } from '../types';
@@ -59,11 +60,11 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
       {/* Header Banner */}
-      <View style={styles.header}>
+      <View style={[styles.header, UI.shadow.sm]}>
         <View style={styles.headerTitleRow}>
-          <Building2 size={22} color={Colors.amberWarning} />
+          <Building2 size={24} color={Colors.amberWarning} />
           <View>
             <Text style={styles.title}>Municipal & NADMO Command Brief</Text>
             <Text style={styles.subtitle}>
@@ -102,9 +103,9 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
       </View>
 
       {/* 3-Bullet Public Works Directives (From Gemini Synthesis) */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, UI.shadow.sm]}>
         <View style={styles.sectionTitleRow}>
-          <Wrench size={16} color={Colors.electricCyan} />
+          <Wrench size={17} color={Colors.electricCyan} />
           <Text style={styles.sectionTitle}>Gemini AI Public Works Engineering Plan</Text>
         </View>
         <Text style={styles.sectionDesc}>
@@ -121,8 +122,8 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
             </View>
           )) || (
             <Text style={styles.directiveText}>
-              • Dispatch desilting excavators to primary outfall culverts.{'\n'}
-              • Clear plastic waste blockages along main drainage channels.{'\n'}
+              • Dispatch desilting excavators to primary outfall culverts.{' '}
+              • Clear plastic waste blockages along main drainage channels.{' '}
               • Stage standby emergency pumps at low-lying depression junctions.
             </Text>
           )}
@@ -130,9 +131,9 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
       </View>
 
       {/* Desilting Priority Clusters */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, UI.shadow.sm]}>
         <View style={styles.sectionTitleRow}>
-          <Truck size={16} color={Colors.amberWarning} />
+          <Truck size={17} color={Colors.amberWarning} />
           <Text style={styles.sectionTitle}>Desilting Priority Zones (Odaw / Klottey Basin)</Text>
         </View>
 
@@ -174,20 +175,20 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
 
       {/* Assembly Action Brief Generation Button */}
       <TouchableOpacity
-        style={styles.generateButton}
+        style={[styles.generateButton, UI.shadow.md]}
         onPress={handleGenerateBrief}
         activeOpacity={0.8}
       >
-        <FileText size={18} color={Colors.bgDark} />
+        <FileText size={20} color={Colors.bgDark} />
         <Text style={styles.generateButtonText}>
           {briefGenerated ? 'Assembly Action Brief Generated' : 'Generate Assembly Action Brief'}
         </Text>
       </TouchableOpacity>
 
       {briefGenerated && (
-        <View style={styles.briefSummaryCard}>
+        <View style={[styles.briefSummaryCard, { borderColor: 'rgba(52, 211, 153, 0.4)' }]}>
           <View style={styles.briefSuccessHeader}>
-            <CheckCircle2 size={18} color={Colors.emeraldSuccess} />
+            <CheckCircle2 size={20} color={Colors.emeraldSuccess} />
             <Text style={styles.briefSuccessTitle}>
               Action Brief #SG-{currentCatchment.id.toUpperCase()}-2026 Ready
             </Text>
@@ -197,7 +198,7 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
           </Text>
 
           <TouchableOpacity style={styles.shareButton} onPress={handleShareBrief}>
-            <Share2 size={16} color={Colors.electricCyan} />
+            <Share2 size={17} color={Colors.electricCyan} />
             <Text style={styles.shareButtonText}>Transmit to District Chief Executive & NADMO</Text>
           </TouchableOpacity>
         </View>
@@ -209,94 +210,95 @@ export const MunicipalSummaryModal: React.FC<MunicipalSummaryModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingHorizontal: 20,
+    paddingTop: 16,
   },
   header: {
     backgroundColor: Colors.cardSurface,
     borderRadius: UI.borderRadius.lg,
-    padding: 16,
+    padding: 20,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   headerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
+    gap: 12,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '900',
     color: Colors.textPrimary,
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.textSecondary,
-    marginTop: 2,
+    marginTop: 3,
   },
   closeBtn: {
     alignSelf: 'flex-start',
     backgroundColor: Colors.cardElevated,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: UI.borderRadius.pill,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
   },
   closeBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     color: Colors.electricCyan,
   },
   kpiGrid: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
+    gap: 10,
+    marginBottom: 16,
   },
   kpiCard: {
     flex: 1,
     backgroundColor: Colors.cardSurface,
     borderRadius: UI.borderRadius.md,
-    padding: 12,
+    padding: 14,
     alignItems: 'center',
     borderWidth: 1,
+    ...UI.shadow.sm,
   },
   kpiValue: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '900',
   },
   kpiLabel: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: Colors.textMuted,
-    marginTop: 4,
+    marginTop: 5,
     textAlign: 'center',
   },
   sectionCard: {
     backgroundColor: Colors.cardSurface,
     borderRadius: UI.borderRadius.lg,
-    padding: 16,
+    padding: 18,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    gap: 10,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     color: Colors.textPrimary,
   },
   sectionDesc: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   directivesList: {
     gap: 10,
@@ -304,144 +306,144 @@ const styles = StyleSheet.create({
   directiveItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
+    gap: 12,
     backgroundColor: Colors.cardElevated,
-    padding: 10,
+    padding: 12,
     borderRadius: UI.borderRadius.md,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.sm,
   },
   directiveIndexWrap: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: Colors.electricCyan,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 1,
   },
   directiveIndex: {
-    fontSize: 11,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: '900',
     color: Colors.bgDark,
   },
   directiveText: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textPrimary,
-    lineHeight: 18,
+    lineHeight: 20,
     flex: 1,
   },
   zoneList: {
-    gap: 8,
+    gap: 10,
   },
   zoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     backgroundColor: Colors.cardElevated,
-    padding: 10,
+    padding: 12,
     borderRadius: UI.borderRadius.md,
+    ...UI.shadow.sm,
   },
   zoneDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: Colors.crimsonEmergency,
   },
   zoneName: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.textPrimary,
   },
   zoneNotes: {
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.textSecondary,
-    marginTop: 1,
+    marginTop: 2,
   },
   priorityBadgeImmediate: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(248, 113, 113, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: UI.borderRadius.pill,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.crimsonEmergency,
   },
   priorityBadgeHigh: {
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(251, 191, 36, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: UI.borderRadius.pill,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.amberWarning,
   },
   priorityBadgeWaterlog: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(96, 165, 250, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: UI.borderRadius.pill,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.waterlogBlue,
   },
   priorityBadgeText: {
-    fontSize: 8,
-    fontWeight: '800',
+    fontSize: 9,
+    fontWeight: '900',
     color: Colors.textPrimary,
   },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     backgroundColor: Colors.electricCyan,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: UI.borderRadius.lg,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   generateButtonText: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '900',
     color: Colors.bgDark,
   },
   briefSummaryCard: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: 'rgba(52, 211, 153, 0.1)',
     borderRadius: UI.borderRadius.lg,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    marginBottom: 20,
+    padding: 16,
+    borderWidth: 1.5,
+    marginBottom: 24,
   },
   briefSuccessHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    gap: 10,
+    marginBottom: 8,
   },
   briefSuccessTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
     color: Colors.emeraldSuccess,
   },
   briefSummaryText: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
-    lineHeight: 16,
-    marginBottom: 10,
+    lineHeight: 18,
+    marginBottom: 12,
   },
   shareButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
     backgroundColor: Colors.cardSurface,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: UI.borderRadius.md,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
   },
   shareButtonText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.electricCyan,
   },
 });
-

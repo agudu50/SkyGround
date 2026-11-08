@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { BlurView } from 'expo-blur';
 import { Colors, UI } from '../theme/colors';
 import { Catchment, GeminiAdvisory, LanguageCode, ThreatLevel } from '../types';
 import { AudioAlertCard } from './AudioAlertCard';
@@ -26,9 +27,9 @@ export const DynamicThreatBanner: React.FC<DynamicThreatBannerProps> = ({
 
   if (threatLevel === 'LOW') {
     return (
-      <View style={styles.normalContainer}>
+      <View style={[styles.normalContainer, UI.shadow.sm]}>
         <View style={styles.normalBadge}>
-          <ShieldAlert size={14} color={Colors.emeraldSuccess} />
+          <ShieldAlert size={15} color={Colors.emeraldSuccess} />
           <Text style={styles.normalBadgeText}>DRII RISK LEVEL: NOMINAL</Text>
         </View>
         <Text style={styles.normalText}>
@@ -48,103 +49,109 @@ export const DynamicThreatBanner: React.FC<DynamicThreatBannerProps> = ({
     setIsExpanded(!isExpanded);
   };
 
+  const glowColor = isCritical ? Colors.crimsonEmergency : Colors.amberWarning;
+
   return (
     <Animated.View
       entering={FadeIn.duration(300)}
       exiting={FadeOut.duration(200)}
       layout={Layout.springify()}
       style={[
-        styles.bannerCard,
-        {
-          backgroundColor: threatTheme.bg,
-          borderColor: threatTheme.border,
-        },
+        styles.bannerWrap,
+        { borderColor: threatTheme.border },
+        UI.shadow.md,
       ]}
     >
-      {/* High-Contrast Header Bar */}
-      <TouchableOpacity
-        style={styles.headerBar}
-        onPress={toggleExpand}
-        activeOpacity={0.8}
-      >
-        <View style={styles.headerLeft}>
-          <View style={[styles.alertIconWrap, { backgroundColor: threatTheme.primary }]}>
-            <AlertTriangle size={18} color={Colors.bgDark} />
-          </View>
-          <View style={styles.headerTitles}>
-            <View style={styles.badgeRow}>
-              <View style={[styles.threatBadge, { backgroundColor: threatTheme.badge }]}>
-                <Text style={styles.threatBadgeText}>{threatTheme.label}</Text>
+      <BlurView style={styles.bannerBlur} intensity={18}>
+        <View style={styles.bannerCard}>
+          {/* High-Contrast Header Bar */}
+          <TouchableOpacity
+            style={styles.headerBar}
+            onPress={toggleExpand}
+            activeOpacity={0.8}
+          >
+            <View style={styles.headerLeft}>
+              <View style={[styles.alertIconWrap, { backgroundColor: threatTheme.primary }]}>
+                <AlertTriangle size={20} color={Colors.bgDark} />
               </View>
-              <Text style={styles.timeTag}>DRII LIVE REASONING</Text>
-            </View>
-            <Text style={styles.headlineText} numberOfLines={2}>
-              {advisory?.headline || (isCritical ? 'Severe Inundation Warning' : 'Rapid Runoff Alert')}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.expandIconWrap}>
-          {isExpanded ? (
-            <ChevronUp size={20} color={threatTheme.primary} />
-          ) : (
-            <ChevronDown size={20} color={threatTheme.primary} />
-          )}
-        </View>
-      </TouchableOpacity>
-
-      {/* Expandable Body */}
-      {isExpanded && (
-        <View style={styles.expandedContent}>
-          {/* Gemini Actionable Warning in Conversational English */}
-          <View style={styles.advisoryTextBox}>
-            <Text style={styles.advisoryText}>
-              {advisory?.community_action_en ||
-                `Heavy storm runoff active in ${catchment.name}. Soil moisture saturation is extremely high.`}
-            </Text>
-
-            {advisory?.evacuation_notice && (
-              <View style={styles.evacuationCallout}>
-                <Navigation size={14} color={threatTheme.primary} />
-                <Text style={[styles.evacuationText, { color: isCritical ? '#FECACA' : '#FDE68A' }]}>
-                  {advisory.evacuation_notice}
+              <View style={styles.headerTitles}>
+                <View style={styles.badgeRow}>
+                  <View style={[styles.threatBadge, { backgroundColor: threatTheme.badge }]}>
+                    <Text style={styles.threatBadgeText}>{threatTheme.label}</Text>
+                  </View>
+                  <Text style={styles.timeTag}>DRII LIVE REASONING</Text>
+                </View>
+                <Text style={styles.headlineText} numberOfLines={2}>
+                  {advisory?.headline || (isCritical ? 'Severe Inundation Warning' : 'Rapid Runoff Alert')}
                 </Text>
               </View>
-            )}
-
-            <View style={styles.aiSignoffRow}>
-              <Sparkles size={11} color={Colors.textMuted} />
-              <Text style={styles.aiSignoffText}>
-                Google AI Studio (Gemini 2.5 Flash) • Hydrology Confidence: {advisory?.confidence_pct || 94}%
-              </Text>
             </View>
-          </View>
 
-          {/* Embedded Audio Broadcast Advisory */}
-          <AudioAlertCard
-            threatLevel={threatLevel}
-            selectedLanguage={selectedLanguage}
-            onLanguageChange={onLanguageChange}
-            geminiAdvisoryText={advisory?.community_action_en}
-          />
+            <View style={styles.expandIconWrap}>
+              {isExpanded ? (
+                <ChevronUp size={22} color={threatTheme.primary} />
+              ) : (
+                <ChevronDown size={22} color={threatTheme.primary} />
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {/* Expandable Body */}
+          {isExpanded && (
+            <View style={styles.expandedContent}>
+              {/* Gemini Actionable Warning */}
+              <View style={[styles.advisoryTextBox, { borderColor: 'rgba(255, 255, 255, 0.08)' }]}>
+                <Text style={styles.advisoryText}>
+                  {advisory?.community_action_en ||
+                    `Heavy storm runoff active in ${catchment.name}. Soil moisture saturation is extremely high.`}
+                </Text>
+
+                {advisory?.evacuation_notice && (
+                  <View style={styles.evacuationCallout}>
+                    <Navigation size={15} color={threatTheme.primary} />
+                    <Text style={[styles.evacuationText, { color: isCritical ? '#FCA5A5' : '#FDE68A' }]}>
+                      {advisory.evacuation_notice}
+                    </Text>
+                  </View>
+                )}
+
+                <View style={styles.aiSignoffRow}>
+                  <Sparkles size={12} color={Colors.textMuted} />
+                  <Text style={styles.aiSignoffText}>
+                    Google AI Studio (Gemini 2.5 Flash) • Hydrology Confidence: {advisory?.confidence_pct || 94}%
+                  </Text>
+                </View>
+              </View>
+
+              {/* Embedded Audio Broadcast Advisory */}
+              <AudioAlertCard
+                threatLevel={threatLevel}
+                selectedLanguage={selectedLanguage}
+                onLanguageChange={onLanguageChange}
+                geminiAdvisoryText={advisory?.community_action_en}
+              />
+            </View>
+          )}
         </View>
-      )}
+      </BlurView>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  bannerCard: {
-    marginHorizontal: 16,
-    marginVertical: 6,
+  bannerWrap: {
+    marginHorizontal: 20,
+    marginVertical: 8,
     borderRadius: UI.borderRadius.xl,
     borderWidth: 1.5,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
+    overflow: 'hidden',
+  },
+  bannerBlur: {
+    borderRadius: UI.borderRadius.xl,
+    overflow: 'hidden',
+  },
+  bannerCard: {
+    padding: 20,
   },
   headerBar: {
     flexDirection: 'row',
@@ -154,15 +161,16 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
     flex: 1,
   },
   alertIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: UI.borderRadius.md,
+    width: 44,
+    height: 44,
+    borderRadius: UI.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    ...UI.shadow.sm,
   },
   headerTitles: {
     flex: 1,
@@ -170,100 +178,98 @@ const styles = StyleSheet.create({
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    gap: 10,
+    marginBottom: 6,
   },
   threatBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: UI.borderRadius.pill,
   },
   threatBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
+    fontSize: 10,
+    fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   timeTag: {
-    fontSize: 9,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.textMuted,
     letterSpacing: 0.4,
   },
   headlineText: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '800',
     color: Colors.textPrimary,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   expandIconWrap: {
-    paddingLeft: 8,
+    paddingLeft: 10,
   },
   expandedContent: {
-    marginTop: 12,
+    marginTop: 16,
   },
   advisoryTextBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderRadius: UI.borderRadius.md,
-    padding: 12,
+    padding: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   advisoryText: {
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textPrimary,
-    lineHeight: 20,
-    fontWeight: '500',
+    lineHeight: 22,
+    fontWeight: '600',
   },
   evacuationCallout: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 8,
-    paddingTop: 8,
+    gap: 8,
+    marginTop: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.08)',
   },
   evacuationText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     flex: 1,
   },
   aiSignoffRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    marginTop: 8,
+    gap: 6,
+    marginTop: 10,
   },
   aiSignoffText: {
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.textMuted,
   },
   normalContainer: {
-    marginHorizontal: 16,
-    marginVertical: 6,
+    marginHorizontal: 20,
+    marginVertical: 8,
     borderRadius: UI.borderRadius.lg,
     backgroundColor: 'rgba(16, 185, 129, 0.08)',
     borderWidth: 1,
     borderColor: 'rgba(16, 185, 129, 0.25)',
-    padding: 12,
+    padding: 16,
   },
   normalBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
+    gap: 8,
+    marginBottom: 6,
   },
   normalBadgeText: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     color: Colors.emeraldSuccess,
     letterSpacing: 0.5,
   },
   normalText: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: 18,
   },
 });
-

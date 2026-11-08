@@ -7,14 +7,14 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Colors, UI } from '../theme/colors';
 import { Catchment, LanguageCode } from '../types';
 import { ACCRA_CATCHMENTS } from '../constants/catchments';
 import { MapPin, Wifi, ShieldAlert, ChevronDown, Check, Building2, User } from 'lucide-react-native';
 
-interface HeaderProps {
-  currentCatchment: Catchment;
+interface HeaderProps {  currentCatchment: Catchment;
   onSelectCatchment: (c: Catchment) => void;
   selectedLanguage: LanguageCode;
   onSelectLanguage: (lang: LanguageCode) => void;
@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
     onSelectLanguage(lang);
   };
 
-  const threatColor = Colors.threat[currentCatchment.current_threat_level].primary;
+  const threatTheme = Colors.threat[currentCatchment.current_threat_level];
 
   return (
     <View style={styles.container}>
@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
         <View style={styles.brandContainer}>
           <View style={styles.brandDot} />
           <Text style={styles.brandTitle}>SkyGround</Text>
-          <View style={[styles.statusBadge, { borderColor: isOnline ? 'rgba(16, 185, 129, 0.4)' : 'rgba(245, 158, 11, 0.4)' }]}>
+          <View style={[styles.statusBadge, { borderColor: isOnline ? 'rgba(52, 211, 153, 0.35)' : 'rgba(251, 191, 36, 0.35)' }]}>
             <Wifi size={11} color={isOnline ? Colors.emeraldSuccess : Colors.amberWarning} />
             <Text style={[styles.statusBadgeText, { color: isOnline ? Colors.emeraldSuccess : Colors.amberWarning }]}>
               {isOnline ? 'POSTGIS LIVE' : 'OFFLINE MATRIX'}
@@ -100,8 +100,8 @@ export const Header: React.FC<HeaderProps> = ({
         activeOpacity={0.8}
       >
         <View style={styles.locationLeft}>
-          <View style={[styles.locationIconWrap, { backgroundColor: Colors.threat[currentCatchment.current_threat_level].bg }]}>
-            <MapPin size={18} color={threatColor} />
+          <View style={[styles.locationIconWrap, { backgroundColor: threatTheme.bg }]}>
+            <MapPin size={18} color={threatTheme.primary} />
           </View>
           <View style={styles.locationTextContainer}>
             <View style={styles.locationTitleRow}>
@@ -117,8 +117,8 @@ export const Header: React.FC<HeaderProps> = ({
         </View>
 
         {/* Threat Pill */}
-        <View style={[styles.threatPill, { backgroundColor: Colors.threat[currentCatchment.current_threat_level].bg, borderColor: threatColor }]}>
-          <Text style={[styles.threatPillText, { color: threatColor }]}>
+        <View style={[styles.threatPill, { backgroundColor: threatTheme.bg, borderColor: threatTheme.border }]}>
+          <Text style={[styles.threatPillText, { color: threatTheme.primary }]}>
             {currentCatchment.current_threat_level}
           </Text>
         </View>
@@ -126,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Language Chips */}
       <View style={styles.languageRow}>
-        <Text style={styles.languageLabel}>Audio Alert Voice:</Text>
+        <Text style={styles.languageLabel}>Audio Alert Voice</Text>
         <View style={styles.chipsContainer}>
           {(['tw', 'gaa', 'en'] as LanguageCode[]).map((lang) => {
             const isSelected = selectedLanguage === lang;
@@ -167,54 +167,56 @@ export const Header: React.FC<HeaderProps> = ({
         onRequestClose={() => setCatchmentModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Greater Accra Catchment</Text>
-            <Text style={styles.modalSubtitle}>
-              Target flood-vulnerable urban hydrology zones
-            </Text>
+          <BlurView style={styles.modalBlur} intensity={20}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Greater Accra Catchment</Text>
+              <Text style={styles.modalSubtitle}>
+                Target flood-vulnerable urban hydrology zones
+              </Text>
 
-            <View style={styles.catchmentList}>
-              {ACCRA_CATCHMENTS.map((c) => {
-                const isSelected = c.id === currentCatchment.id;
-                const cThreatColor = Colors.threat[c.current_threat_level].primary;
-                return (
-                  <TouchableOpacity
-                    key={c.id}
-                    style={[
-                      styles.catchmentItem,
-                      isSelected && styles.catchmentItemSelected,
-                    ]}
-                    onPress={() => {
-                      try { Haptics.selectionAsync(); } catch(e) {}
-                      onSelectCatchment(c);
-                      setCatchmentModalVisible(false);
-                    }}
-                  >
-                    <View style={styles.catchmentItemLeft}>
-                      <View style={[styles.catchmentDot, { backgroundColor: cThreatColor }]} />
-                      <View>
-                        <Text style={styles.catchmentItemName}>{c.name}</Text>
-                        <Text style={styles.catchmentItemDistrict}>{c.district} • {c.drainage_outfall}</Text>
+              <View style={styles.catchmentList}>
+                {ACCRA_CATCHMENTS.map((c) => {
+                  const isSelected = c.id === currentCatchment.id;
+                  const cThreatColor = Colors.threat[c.current_threat_level].primary;
+                  return (
+                    <TouchableOpacity
+                      key={c.id}
+                      style={[
+                        styles.catchmentItem,
+                        isSelected && styles.catchmentItemSelected,
+                      ]}
+                      onPress={() => {
+                        try { Haptics.selectionAsync(); } catch(e) {}
+                        onSelectCatchment(c);
+                        setCatchmentModalVisible(false);
+                      }}
+                    >
+                      <View style={styles.catchmentItemLeft}>
+                        <View style={[styles.catchmentDot, { backgroundColor: cThreatColor }]} />
+                        <View>
+                          <Text style={styles.catchmentItemName}>{c.name}</Text>
+                          <Text style={styles.catchmentItemDistrict}>{c.district} • {c.drainage_outfall}</Text>
+                        </View>
                       </View>
-                    </View>
-                    <View style={styles.catchmentItemRight}>
-                      <Text style={[styles.catchmentItemThreat, { color: cThreatColor }]}>
-                        {c.current_threat_level}
-                      </Text>
-                      {isSelected && <Check size={16} color={Colors.electricCyan} style={{ marginLeft: 6 }} />}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                      <View style={styles.catchmentItemRight}>
+                        <Text style={[styles.catchmentItemThreat, { color: cThreatColor }]}>
+                          {c.current_threat_level}
+                        </Text>
+                        {isSelected && <Check size={16} color={Colors.electricCyan} style={{ marginLeft: 6 }} />}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
 
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setCatchmentModalVisible(false)}
-            >
-              <Text style={styles.modalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setCatchmentModalVisible(false)}
+              >
+                <Text style={styles.modalCloseButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </BlurView>
         </View>
       </Modal>
     </View>
@@ -223,46 +225,46 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 12 : 16,
-    paddingBottom: 8,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 16 : 20,
+    paddingBottom: 14,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   brandContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   brandDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: Colors.electricCyan,
   },
   brandTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
     color: Colors.textPrimary,
     letterSpacing: -0.5,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: UI.borderRadius.pill,
     borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   statusBadgeText: {
-    fontSize: 9,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
   modeToggle: {
@@ -272,47 +274,49 @@ const styles = StyleSheet.create({
     padding: 3,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.sm,
   },
   modeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: UI.borderRadius.pill,
   },
   modeButtonActive: {
     backgroundColor: Colors.electricCyan,
   },
   modeButtonText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: Colors.textSecondary,
   },
   modeButtonTextActive: {
     color: Colors.bgDark,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   locationBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: Colors.cardSurface,
-    borderRadius: UI.borderRadius.lg,
-    padding: 12,
+    borderRadius: UI.borderRadius.xl,
+    padding: 14,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.md,
   },
   locationLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 10,
+    gap: 12,
   },
   locationIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: UI.borderRadius.md,
+    width: 40,
+    height: 40,
+    borderRadius: UI.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -324,124 +328,134 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   neighborhoodText: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: Colors.textPrimary,
   },
   districtText: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 1,
   },
   threatPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: UI.borderRadius.pill,
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   threatPillText: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
   languageRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 12,
     paddingHorizontal: 4,
   },
   languageLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: Colors.textMuted,
+    letterSpacing: 0.4,
   },
   chipsContainer: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   languageChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: UI.borderRadius.pill,
     backgroundColor: Colors.cardSurface,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.sm,
   },
   languageChipSelected: {
-    backgroundColor: 'rgba(6, 182, 212, 0.16)',
+    backgroundColor: 'rgba(34, 211, 238, 0.16)',
     borderColor: Colors.electricCyan,
   },
   languageChipText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: Colors.textSecondary,
   },
   languageChipTextSelected: {
     color: Colors.electricCyan,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(2, 4, 8, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
+  },
+  modalBlur: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
   },
   modalContent: {
     width: '100%',
     backgroundColor: Colors.cardSurface,
     borderRadius: UI.borderRadius.xl,
-    padding: 20,
+    padding: 24,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.lg,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     color: Colors.textPrimary,
   },
   modalSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textSecondary,
-    marginBottom: 16,
-    marginTop: 2,
+    marginBottom: 18,
+    marginTop: 4,
   },
   catchmentList: {
-    gap: 8,
+    gap: 10,
   },
   catchmentItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 12,
+    padding: 14,
     backgroundColor: Colors.cardElevated,
     borderRadius: UI.borderRadius.md,
     borderWidth: 1,
     borderColor: Colors.borderSubtle,
+    ...UI.shadow.sm,
   },
   catchmentItemSelected: {
     borderColor: Colors.electricCyan,
-    backgroundColor: 'rgba(6, 182, 212, 0.08)',
+    backgroundColor: 'rgba(34, 211, 238, 0.06)',
   },
   catchmentItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     flex: 1,
   },
   catchmentDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   catchmentItemName: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
     color: Colors.textPrimary,
   },
   catchmentItemDistrict: {
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 1,
   },
@@ -450,20 +464,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   catchmentItemThreat: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
   },
   modalCloseButton: {
-    marginTop: 16,
+    marginTop: 20,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: UI.borderRadius.md,
     backgroundColor: Colors.cardHighlight,
   },
   modalCloseButtonText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     color: Colors.textPrimary,
   },
 });
-

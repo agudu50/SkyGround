@@ -188,7 +188,7 @@ export const HomeScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: Colors.bgDark,
@@ -201,6 +201,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+    paddingBottom: Platform.OS === 'ios' ? 100 : 80,
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Colors, UI } from '../theme/colors';
 import { LanguageCode, ThreatLevel } from '../types';
@@ -29,8 +30,8 @@ export const AudioAlertCard: React.FC<AudioAlertCardProps> = ({
   const [isTranslating, setIsTranslating] = useState(false);
 
   const fallback = AUDIO_SCRIPTS[threatLevel][selectedLanguage];
+  const threatTheme = Colors.threat[threatLevel];
 
-  // Fetch or prepare translated text when language or threat level changes
   useEffect(() => {
     let isMounted = true;
     const prepareText = async () => {
@@ -48,7 +49,6 @@ export const AudioAlertCard: React.FC<AudioAlertCardProps> = ({
     };
   }, [selectedLanguage, threatLevel, geminiAdvisoryText]);
 
-  // Hook up AudioEngine listener
   useEffect(() => {
     AudioEngine.setListener((status) => {
       setIsPlaying(status.isPlaying);
@@ -87,196 +87,207 @@ export const AudioAlertCard: React.FC<AudioAlertCardProps> = ({
     }
   };
 
-  const threatColor = Colors.threat[threatLevel].primary;
-
   return (
-    <View style={[styles.container, { borderColor: Colors.threat[threatLevel].border }]}>
-      {/* Top Header: Voice Indicator & Language Switcher */}
-      <View style={styles.topRow}>
-        <View style={styles.voiceTitleWrap}>
-          <Volume2 size={16} color={threatColor} />
-          <Text style={[styles.voiceTitle, { color: threatColor }]}>
-            Broadcast Advisory ({fallback.languageName})
-          </Text>
-        </View>
-
-        <View style={styles.langPillContainer}>
-          {(['tw', 'gaa', 'en'] as LanguageCode[]).map((lang) => {
-            const isSel = selectedLanguage === lang;
-            const shortLabels: Record<LanguageCode, string> = {
-              tw: 'Twi',
-              gaa: 'Ga',
-              en: 'EN',
-            };
-            return (
-              <TouchableOpacity
-                key={lang}
-                style={[styles.langPill, isSel && { backgroundColor: threatColor }]}
-                onPress={() => {
-                  try { Haptics.selectionAsync(); } catch (e) {}
-                  onLanguageChange(lang);
-                }}
-              >
-                <Text style={[styles.langPillText, isSel && styles.langPillTextActive]}>
-                  {shortLabels[lang]}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Script Text Snippet */}
-      <Text style={styles.scriptText} numberOfLines={3}>
-        {isTranslating ? 'Translating alert with Khaya AI...' : localizedText || fallback.script}
-      </Text>
-
-      {/* Pulsing Audio Waveform Visualizer */}
-      <View style={styles.waveformRow}>
-        {[14, 28, 42, 22, 36, 18, 46, 30, 20, 38, 26, 15, 32, 24, 40, 16].map((h, i) => {
-          const barHeight = isPlaying ? Math.max(8, (h * ((i % 3) + 1.2)) % 44) : Math.max(6, h * 0.4);
-          const barActive = progress > i / 16;
-          return (
-            <View
-              key={i}
-              style={[
-                styles.waveformBar,
-                {
-                  height: barHeight,
-                  backgroundColor: barActive ? threatColor : 'rgba(255, 255, 255, 0.15)',
-                },
-              ]}
-            />
-          );
-        })}
-      </View>
-
-      {/* Playback Controls & Progress Bar */}
-      <View style={styles.controlsRow}>
-        <TouchableOpacity
-          style={[styles.playButton, { backgroundColor: threatColor }]}
-          onPress={handlePlayToggle}
-          activeOpacity={0.8}
-        >
-          {isPlaying ? (
-            <Pause size={22} color={Colors.bgDark} />
-          ) : (
-            <Play size={22} color={Colors.bgDark} style={{ marginLeft: 2 }} />
-          )}
-        </TouchableOpacity>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBarBg}>
-            <View
-              style={[
-                styles.progressBarFill,
-                {
-                  width: `${Math.round(progress * 100)}%`,
-                  backgroundColor: threatColor,
-                },
-              ]}
-            />
-          </View>
-          <View style={styles.timeRow}>
-            <Text style={styles.timeText}>0:{currentPosition < 10 ? `0${currentPosition}` : currentPosition}</Text>
-            <View style={styles.aiTag}>
-              <Sparkles size={10} color={Colors.textMuted} />
-              <Text style={styles.aiTagText}>Khaya Voice & Audio Matrix</Text>
+    <View style={[styles.containerWrap, { borderColor: threatTheme.border }, UI.shadow.sm]}>
+      <BlurView style={styles.cardBlur} intensity={16}>
+        <View style={styles.cardContent}>
+          {/* Top Header: Voice Indicator & Language Switcher */}
+          <View style={styles.topRow}>
+            <View style={styles.voiceTitleWrap}>
+              <Volume2 size={17} color={threatTheme.primary} />
+              <Text style={[styles.voiceTitle, { color: threatTheme.primary }]}>
+                Broadcast Advisory ({fallback.languageName})
+              </Text>
             </View>
-            <Text style={styles.timeText}>0:{duration < 10 ? `0${duration}` : duration}</Text>
+
+            <View style={styles.langPillContainer}>
+              {(['tw', 'gaa', 'en'] as LanguageCode[]).map((lang) => {
+                const isSel = selectedLanguage === lang;
+                const shortLabels: Record<LanguageCode, string> = {
+                  tw: 'Twi',
+                  gaa: 'Ga',
+                  en: 'EN',
+                };
+                return (
+                  <TouchableOpacity
+                    key={lang}
+                    style={[styles.langPill, isSel && styles.langPillSelected]}
+                    onPress={() => {
+                      try { Haptics.selectionAsync(); } catch (e) {}
+                      onLanguageChange(lang);
+                    }}
+                  >
+                    <Text style={[styles.langPillText, isSel && styles.langPillTextActive]}>
+                      {shortLabels[lang]}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Script Text Snippet */}
+          <Text style={styles.scriptText} numberOfLines={3}>
+            {isTranslating ? 'Translating alert with Khaya AI...' : localizedText || fallback.script}
+          </Text>
+
+          {/* Pulsing Audio Waveform Visualizer */}
+          <View style={styles.waveformRow}>
+            {[14, 28, 42, 22, 36, 18, 46, 30, 20, 38, 26, 15, 32, 24, 40, 16].map((h, i) => {
+              const barHeight = isPlaying ? Math.max(8, (h * ((i % 3) + 1.2)) % 46) : Math.max(6, h * 0.4);
+              const barActive = progress > i / 16;
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.waveformBar,
+                    {
+                      height: barHeight,
+                      backgroundColor: barActive ? threatTheme.primary : 'rgba(255, 255, 255, 0.12)',
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
+
+          {/* Playback Controls & Progress Bar */}
+          <View style={styles.controlsRow}>
+            <TouchableOpacity
+              style={[styles.playButton, { backgroundColor: threatTheme.primary }]}
+              onPress={handlePlayToggle}
+              activeOpacity={0.8}
+            >
+              {isPlaying ? (
+                <Pause size={24} color={Colors.bgDark} />
+              ) : (
+                <Play size={24} color={Colors.bgDark} style={{ marginLeft: 2 }} />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBarBg}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${Math.round(progress * 100)}%`,
+                      backgroundColor: threatTheme.primary,
+                    },
+                  ]}
+                />
+              </View>
+              <View style={styles.timeRow}>
+                <Text style={styles.timeText}>
+                  0:{currentPosition < 10 ? `0${currentPosition}` : currentPosition}
+                </Text>
+                <View style={styles.aiTag}>
+                  <Sparkles size={11} color={Colors.textMuted} />
+                  <Text style={styles.aiTagText}>Khaya Voice & Audio Matrix</Text>
+                </View>
+                <Text style={styles.timeText}>
+                  0:{duration < 10 ? `0${duration}` : duration}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
-      </View>
+      </BlurView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'rgba(11, 15, 23, 0.75)',
+  containerWrap: {
+    marginTop: 14,
     borderRadius: UI.borderRadius.lg,
-    padding: 14,
+    overflow: 'hidden',
     borderWidth: 1,
-    marginTop: 12,
+  },
+  cardBlur: {
+    borderRadius: UI.borderRadius.lg,
+    overflow: 'hidden',
+  },
+  cardContent: {
+    padding: 18,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   voiceTitleWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   voiceTitle: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     letterSpacing: 0.2,
   },
   langPillContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: UI.borderRadius.pill,
     padding: 2,
-    gap: 2,
+    gap: 3,
   },
   langPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: UI.borderRadius.pill,
   },
+  langPillSelected: {
+    backgroundColor: 'rgba(34, 211, 238, 0.2)',
+  },
   langPillText: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
     color: Colors.textSecondary,
   },
   langPillTextActive: {
     color: Colors.bgDark,
   },
   scriptText: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textPrimary,
-    lineHeight: 18,
+    lineHeight: 20,
     marginBottom: 10,
   },
   waveformRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 44,
+    height: 46,
     marginVertical: 4,
     paddingHorizontal: 6,
   },
   waveformBar: {
-    width: 3.5,
+    width: 4,
     borderRadius: 2,
   },
   controlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 8,
+    gap: 14,
+    marginTop: 10,
   },
   playButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
+    ...UI.shadow.md,
   },
   progressContainer: {
     flex: 1,
   },
   progressBarBg: {
-    height: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    height: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -288,21 +299,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 5,
   },
   timeText: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: Colors.textMuted,
   },
   aiTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
   },
   aiTagText: {
-    fontSize: 9,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '700',
     color: Colors.textMuted,
   },
 });
