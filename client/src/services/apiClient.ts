@@ -6,6 +6,35 @@ import { KhayaAiService } from './khayaAi';
 
 const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL || 'http://localhost:4000';
 
+const TOKEN_KEY = 'skyground_auth_token';
+
+export function getAuthToken(): string | null {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+  return null;
+}
+
+export function setAuthToken(token: string): void {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+}
+
+export function clearAuthToken(): void {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+}
+
+function authHeaders(): HeadersInit {
+  const token = getAuthToken();
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 export class ApiClient {
   private static isServerAvailable: boolean | null = null;
 
