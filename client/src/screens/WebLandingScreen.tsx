@@ -258,6 +258,7 @@ const Colors = {
   textSecondary: '#CBD5E1',
   textMuted: '#94A3B8',
   borderSubtle: 'rgba(255, 255, 255, 0.08)',
+  divider: 'rgba(255, 255, 255, 0.06)',
 };
 
 const styles = StyleSheet.create({
