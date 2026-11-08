@@ -45,5 +45,11 @@ declare module 'lucide-react-native' {
   export const Wrench: Icon;
   export const Truck: Icon;
   export const Share2: Icon;
+  export const LogIn: Icon;
+  export const LogOut: Icon;
+  export const ArrowLeft: Icon;
+  export const ArrowRight: Icon;
+  export const UserPlus: Icon;
+  export const Radio: Icon;
 }
 

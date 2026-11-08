@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { HomeScreen } from './src/screens/HomeScreen';
+import { WebRouter } from './src/navigation/WebRouter';
 import { Colors } from './src/theme/colors';
 
 export default function App() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      <HomeScreen />
+      {Platform.OS === 'web' ? <WebRouter /> : <HomeScreen />}
     </View>
   );
 }
