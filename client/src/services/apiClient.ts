@@ -161,5 +161,58 @@ export class ApiClient {
     } catch (e) {}
     return KhayaAiService.getAudioForAlert(text, language, threatLevel);
   }
+
+  // Auth
+  static async register(params: {
+    email: string;
+    password: string;
+    fullName?: string;
+    role?: string;
+  }) {
+    const res = await fetch(`${SERVER_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const json = await res.json();
+    if (res.ok && json.token) {
+      setAuthToken(json.token);
+    }
+    return { ok: res.ok, ...json };
+  }
+
+  static async login(params: { email: string; password: string }) {
+    const res = await fetch(`${SERVER_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const json = await res.json();
+    if (res.ok && json.token) {
+      setAuthToken(json.token);
+    }
+    return { ok: res.ok, ...json };
+  }
+
+  static async logout() {
+    clearAuthToken();
+    try {
+      await fetch(`${SERVER_URL}/api/auth/logout`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+    } catch {}
+    return { ok: true };
+  }
+
+  static async me() {
+    const res = await fetch(`${SERVER_URL}/api/auth/me`, {
+      method: 'GET',
+      headers: authHeaders(),
+    });
+    if (!res.ok) return { ok: false, user: null };
+    const json = await res.json();
+    return { ok: true, user: json.user };
+  }
 }
 
