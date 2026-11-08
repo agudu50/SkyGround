@@ -68,6 +68,18 @@ CREATE TABLE IF NOT EXISTS community_incidents (
 );
 
 CREATE INDEX IF NOT EXISTS idx_incidents_coords ON community_incidents USING GIST(coordinates);
+
+-- 5. Users Table (Auth)
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(256) UNIQUE NOT NULL,
+    password_hash VARCHAR(256) NOT NULL,
+    full_name VARCHAR(256),
+    role VARCHAR(32) DEFAULT 'citizen' CHECK (role IN ('citizen', 'engineer', 'nadmo', 'admin')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 `;
 
 // In-memory fallback dataset for offline/local development

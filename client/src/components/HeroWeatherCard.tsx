@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Colors, UI } from '../theme/colors';
@@ -62,37 +62,77 @@ export const HeroWeatherCard: React.FC<HeroWeatherCardProps> = ({
 
             {/* High-Impact Radial Soil Saturation Gauge */}
             <View style={styles.gaugeContainer}>
-              <Svg width={size} height={size} style={styles.svgGauge}>
-                <Defs>
-                  <LinearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <Stop offset="0%" stopColor={saturationColor} stopOpacity={1} />
-                    <Stop offset="100%" stopColor={isCriticalSaturation ? '#B91C1C' : '#0891B2'} stopOpacity={0.85} />
-                  </LinearGradient>
-                </Defs>
-                {/* Background Track */}
-                <Circle
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  stroke="rgba(255, 255, 255, 0.06)"
-                  strokeWidth={strokeWidth}
-                  fill="none"
-                />
-                {/* Progress Arc */}
-                <Circle
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  stroke="url(#gaugeGrad)"
-                  strokeWidth={strokeWidth}
-                  fill="none"
-                  strokeDasharray={`${circumference} ${circumference}`}
-                  strokeDashoffset={strokeDashoffset}
-                  strokeLinecap="round"
-                  rotation="-90"
-                  origin={`${size / 2}, ${size / 2}`}
-                />
-              </Svg>
+              {Platform.OS === 'web' ? (
+                // @ts-ignore Standard web SVG element for React DOM on web platform
+                <svg
+                  width={size}
+                  height={size}
+                  style={{ position: 'absolute', top: 0, left: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={saturationColor} stopOpacity="1" />
+                      <stop
+                        offset="100%"
+                        stopColor={isCriticalSaturation ? '#B91C1C' : '#0891B2'}
+                        stopOpacity="0.85"
+                      />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="rgba(255, 255, 255, 0.06)"
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                  />
+                  <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="url(#gaugeGrad)"
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                    strokeDasharray={`${circumference} ${circumference}`}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                  />
+                </svg>
+              ) : (
+                <Svg width={size} height={size} style={styles.svgGauge}>
+                  <Defs>
+                    <LinearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <Stop offset="0%" stopColor={saturationColor} stopOpacity={1} />
+                      <Stop offset="100%" stopColor={isCriticalSaturation ? '#B91C1C' : '#0891B2'} stopOpacity={0.85} />
+                    </LinearGradient>
+                  </Defs>
+                  {/* Background Track */}
+                  <Circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="rgba(255, 255, 255, 0.06)"
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                  />
+                  {/* Progress Arc */}
+                  <Circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="url(#gaugeGrad)"
+                    strokeWidth={strokeWidth}
+                    fill="none"
+                    strokeDasharray={`${circumference} ${circumference}`}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    rotation="-90"
+                    origin={`${size / 2}, ${size / 2}`}
+                  />
+                </Svg>
+              )}
 
               <View style={styles.gaugeTextWrap}>
                 <Text style={[styles.gaugeValue, { color: saturationColor }]}>
